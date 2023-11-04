@@ -9,6 +9,7 @@ const app = express();
 app.use(express.json());
 app.use((req, res, next) => {
     requestCounter++;
+    res.header(defaultHeader);
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting a MySQL connection:', err);

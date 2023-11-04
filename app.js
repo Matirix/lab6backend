@@ -94,7 +94,6 @@ app.post('/api/v1/definition', (req, res) => {
 
                 } else {
                     res.status(201).json({
-                        header: defaultHeader,
                         message: stringDictionary.entryCreated,
                         entry: entry,
                         total: requestCounter
@@ -134,7 +133,7 @@ app.patch('/api/v1/definition/:word', (req, res) => {
             );
         } else {
         res.status(201).json({
-            message: stringDictionary.entryCreated,
+            message: stringDictionary.definitionUpdated(word),
             entry: entry,
             total: requestCounter
         });

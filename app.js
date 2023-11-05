@@ -30,8 +30,8 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 const stringDictionary = {
-    found: (word, message) => `Definition found for ${word} : ${message}`,
-    error: (code, message) => `Status code ${code}: ${message}`,
+    found: (word, message) => `Definition found for ${word} : <b> ${message} </b>`,
+    error: (code, message) => `Status code ${code}: <b> ${message} </b>`,
     notFound: (word) => `No definition found for ${word}`,
     wordNotExist: (word) => `The word ${word} does not exist in the dictionary`,
     sqlGet: (word) => `SELECT * FROM dictionary WHERE word = '${word}'`,
@@ -45,8 +45,6 @@ const stringDictionary = {
     BadRequestMessage: "One of the Fields are missing!",
     definitionUpdated: (word) => `Definition for ${word} updated successfully`,
     wordDeletedMessage: (word) => `The word ${word} was deleted successfully`,
-
-
 };
 
 class Entry{
@@ -152,6 +150,13 @@ app.patch('/api/v1/definition/:word', (req, res) => {
 
 app.delete('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word;
+    if (word == "") {
+        res.status(400).json({
+            message: stringDictionary.BadRequestMessage,
+            total: requestCounter
+        });
+        return;
+    }
     const sql = stringDictionary.sqlDelete(word);
     const entry = new Entry(word);
 

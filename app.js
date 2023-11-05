@@ -150,7 +150,7 @@ app.patch('/api/v1/definition/:word', (req, res) => {
 
 app.delete('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word;
-    if (word == "") {
+    if (word.length == 0) {
         res.status(400).json({
             message: stringDictionary.BadRequestMessage,
             total: requestCounter
@@ -191,7 +191,7 @@ app.get('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word
     console.log(word)
 
-    if (word == "") {
+    if (word.length == 0) {
         res.status(400).json({
             message: stringDictionary.BadRequestMessage,
             total: requestCounter

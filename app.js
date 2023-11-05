@@ -30,8 +30,8 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 const stringDictionary = {
-    found: (word, message) => `Definition found for ${word} : <b> ${message} </b>`,
-    error: (code, message) => `Status code ${code}: <b> ${message} </b>`,
+    found: (word, message) => `Definition found for ${word} : ${message} `,
+    error: (code, message) => `Status code ${code}:  ${message}`,
     notFound: (word) => `No definition found for ${word}`,
     wordNotExist: (word) => `The word ${word} does not exist in the dictionary`,
     sqlGet: (word) => `SELECT * FROM dictionary WHERE word = '${word}'`,

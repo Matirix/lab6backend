@@ -147,6 +147,13 @@ app.patch('/api/v1/definition/:word', (req, res) => {
     });
 });
 
+app.delete('/api/v1/definition', (req, res) => {
+    res.status(400).json({
+        message: stringDictionary.BadRequestMessage,
+        total: requestCounter
+    });
+    return;
+})
 
 app.delete('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word;
@@ -187,11 +194,19 @@ app.delete('/api/v1/definition/:word', (req, res) => {
     })
 })
 
+app.get('/api/v1/definition', (req, res) => {
+    res.status(400).json({
+        message: stringDictionary.BadRequestMessage,
+        total: requestCounter
+    });
+    return;
+})
+
 app.get('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word
     console.log(word)
 
-    if (word.length == 0) {
+    if (word.length == 0 || !word) {
         res.status(400).json({
             message: stringDictionary.BadRequestMessage,
             total: requestCounter

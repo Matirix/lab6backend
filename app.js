@@ -111,7 +111,7 @@ app.post('/api/v1/definition', (req, res) => {
     });
 });
 
-app.put('/api/v1/definition/:word', (req, res) => {
+app.patch('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word;
     const definition = req.body.definition;
     const wordLanguage = req.body.wordLanguage;

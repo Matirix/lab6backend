@@ -35,6 +35,7 @@ const stringDictionary = {
     sqlGet: (word) => `SELECT * FROM dictionary WHERE word = '${word}'`,
     sqlDelete: (word) => `DELETE FROM dictionary WHERE word = '${word}'`,
     sqlInsert: (entry) => `INSERT INTO dictionary (word, definition, wordLanguage, defLanguage) VALUES ('${entry.word}', '${entry.definition}', '${entry.wordLanguage}', '${entry.defLanguage}');`,
+    sqlUpdate: (entry) => `UPDATE dictionary SET definition = '${entry.definition}', wordLanguage = '${entry.wordLanguage}', defLanguage = '${entry.defLanguage}' WHERE word = '${entry.word}';`,
     entryCreated: "Entry Created Successfully",
     entryExistsError: "Word Conflict",
     entryExistsMessage: (word) => `The word ${word} already exists in the dictionary`,
@@ -108,17 +109,13 @@ app.post('/api/v1/definition', (req, res) => {
     });
 });
 
-app.patch('/api/v1/definition/:word', (req, res) => {
-    // Either or
-    const word = req.params.word || req.body.word;
+app.put('/api/v1/definition/:word', (req, res) => {
+    const word = req.params.word;
     const definition = req.body.definition;
     const wordLanguage = req.body.wordLanguage;
     const defLanguage = req.body.defLanguage;
-    const entry = new Entry(word, definition, wordLanguage, defLanguage);
-    const sqlGet = stringDictionary.sqlGet(word);
 
-    // If Any fields Empty, then return 400
-    if (!word || !definition || !wordLanguage || !defLanguage) {
+    if (!definition || !wordLanguage || !defLanguage) {
         res.status(400).json({
             message: stringDictionary.BadRequestMessage,
             total: requestCounter
@@ -126,24 +123,30 @@ app.patch('/api/v1/definition/:word', (req, res) => {
         return;
     }
 
-    pool.query(sqlGet, (err, result) => {
-        if (err) {
-            res.status(404).json(
-                {
-                    error: stringDictionary.error(404, stringDictionary.wordNotExist(word)),
-                    total: requestCounter
+    const entry = new Entry(word, definition, wordLanguage, defLanguage);
+    const sqlUpdate = stringDictionary.sqlUpdate(entry);
 
-                }
-            );
+    pool.query(sqlUpdate, (err, result) => {
+        if (err) {
+            res.status(500).json({
+                error: stringDictionary.error(500, 'Internal server error'),
+                total: requestCounter
+            });
+        } else if (result.affectedRows === 0) {
+            res.status(404).json({
+                error: stringDictionary.error(404, stringDictionary.wordNotExist(word)),
+                total: requestCounter
+            });
         } else {
-        res.status(201).json({
-            message: stringDictionary.definitionUpdated(word),
-            entry: entry,
-            total: requestCounter
-        });
+            res.status(200).json({
+                message: stringDictionary.definitionUpdated(word),
+                entry: entry,
+                total: requestCounter
+            });
         }
     });
-})
+});
+
 
 app.delete('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word;

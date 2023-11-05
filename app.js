@@ -178,14 +178,14 @@ app.get('/api/v1/definition/:word', (req, res) => {
     const word = req.params.word
     console.log(word)
 
-    if (!word || !definition || !wordLanguage || !defLanguage) {
+    if (!word) {
         res.status(400).json({
             message: stringDictionary.BadRequestMessage,
             total: requestCounter
         });
         return;
     }
-    
+
     const sql = stringDictionary.sqlGet(word);
     pool.query(sql, (err, result) => {  
         if (err) {

@@ -1,4 +1,5 @@
 const express = require('express');
+const stringDictionary = require('./strings.js');
 
 const pool = require('./database.js');
 const defaultHeader = {"Access-Control-Allow-Origin": "*"}
@@ -28,24 +29,6 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
-const stringDictionary = {
-    found: (word, message) => `Definition found for ${word} : ${message} `,
-    error: (code, message) => `Status code ${code}:  ${message}`,
-    notFound: (word) => `No definition found for ${word}`,
-    wordNotExist: (word) => `The word ${word} does not exist in the dictionary`,
-    sqlGet: (word) => `SELECT * FROM dictionary WHERE word = '${word}'`,
-    sqlDelete: (word) => `DELETE FROM dictionary WHERE word = '${word}'`,
-    sqlInsert: (entry) => `INSERT INTO dictionary (word, definition, wordLanguage, defLanguage) VALUES ('${entry.word}', '${entry.definition}', '${entry.wordLanguage}', '${entry.defLanguage}');`,
-    sqlUpdate: (entry) => `UPDATE dictionary SET definition = '${entry.definition}', wordLanguage = '${entry.wordLanguage}', defLanguage = '${entry.defLanguage}' WHERE word = '${entry.word}';`,
-    entryCreated: "Entry Created Successfully",
-    entryExistsError: "Word Conflict",
-    entryExistsMessage: (word) => `The word ${word} already exists in the dictionary`,
-    internalServerError: "Internal Server Error",
-    BadRequestMessage: "One of the Fields are missing!",
-    definitionUpdated: (word) => `Definition for ${word} updated successfully`,
-    wordDeletedMessage: (word) => `The word ${word} was deleted successfully`,
-};
 
 class Entry{
     constructor(word, definition, word_langauge, defLanguage) {
@@ -265,71 +248,6 @@ app.get('/api/v1/languages', (req, res) => {
         }
     })
 });
-
-
-// All done once DO NOT RUN
-app.delete('/dropTable', (req,res) => {
-    const sql = `DROP TABLE dictionary;`
-    pool.query(sql, (err, result) => {
-        if (err) {
-            res.status(404).end(
-                stringDictionary.error(404, JSON.stringify(err)
-                ));
-        } else {
-            res.status(200).end(JSON.stringify(result));
-        }
-    })
-});
-
-app.post('/api/v1/createTable', (req,res) => {
-    const sql = `CREATE TABLE dictionary (
-        word VARCHAR(255) NOT NULL,
-        definition VARCHAR(255) NOT NULL,
-        wordLanguage VARCHAR(255) NOT NULL,
-        defLanguage VARCHAR(255) NOT NULL,
-        PRIMARY KEY (word)
-    );`
-    console.log(sql);
-    pool.query(sql, (err, result) => {
-        if (err) {
-            res.status(404).end(
-                stringDictionary.error(404, JSON.stringify(err),
-                ));
-        } else {
-            res.status(200).end(JSON.stringify(result));
-        }
-    })
-})
-
-
-
-app.post('/api/v1/createTableLanguage', (req, res) => {
-    const sql = `
-        CREATE TABLE languages (
-            code VARCHAR(2) NOT NULL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL
-        );
-
-        INSERT INTO languages (code, name) VALUES
-            ('en', 'English'),
-            ('ko', 'Korean'),
-            ('tl', 'Tagalog');
-    `;
-
-    console.log(sql);
-
-    pool.query(sql, (err, result) => {
-        if (err) {
-            res.status(404).end(
-                stringDictionary.error(404, JSON.stringify(err))
-            );
-        } else {
-            res.status(200).end(JSON.stringify(result));
-        }
-    });
-});
-
-
 
 
 
